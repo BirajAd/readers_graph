@@ -4,6 +4,7 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from users.models import User
+from posts.models import Post
 from rest_framework.response import Response
 from datetime import datetime
 
@@ -38,4 +39,11 @@ class CustomAuthToken(ObtainAuthToken):
         return Response({
             'token': token.key,
             'user': list(result_user)
+        })
+
+class AllPost(APIView):
+    def get(self, request):
+        return Response({
+            "status": True,
+            "details": Post.objects.all().values('author__username', 'id', 'content')
         })
