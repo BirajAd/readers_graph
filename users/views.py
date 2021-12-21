@@ -7,6 +7,7 @@ from users.models import User
 from posts.models import Post
 from rest_framework.response import Response
 from datetime import datetime
+from django.db.models import F
 
 # Create your views here.
 class Login(APIView):
@@ -43,7 +44,8 @@ class CustomAuthToken(ObtainAuthToken):
 
 class AllPost(APIView):
     def get(self, request):
+        all_posts = Post.objects.values('id', 'content', username=F('author__username') )
         return Response({
             "status": True,
-            "details": Post.objects.all().values('author__username', 'id', 'content')
+            "details": all_posts 
         })
