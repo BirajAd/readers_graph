@@ -10,17 +10,17 @@ from datetime import datetime
 from django.db.models import F
 
 # Create your views here.
-class Login(APIView):
-    def post(self, request, *args, **kwargs):
-        is_authenticated = authenticate(self.request.POST.get("username"), self.request.POST.get("password"))
-        resp = {}
-        if(is_authenticated):
-            resp["status"] = True
-            resp["details"]["key"] = Token.objects.get(user=request.POST.user).key
-            resp["user"] = User.objects.get(user=request.POST.user)
-            return Response(resp)
-        else:
-            return Response({"status": False, "details": "either email or password is wrong."})
+# class Login(APIView):
+#     def post(self, request, *args, **kwargs):
+#         is_authenticated = authenticate(self.request.POST.get("username"), self.request.POST.get("password"))
+#         resp = {}
+#         if(is_authenticated):
+#             resp["status"] = True
+#             resp["details"]["key"] = Token.objects.get(user=request.POST.user).key
+#             resp["user"] = User.objects.get(user=request.POST.user)
+#             return Response(resp)
+#         else:
+#             return Response({"status": False, "details": "either email or password is wrong."})
 
 
 class CustomAuthToken(ObtainAuthToken):
@@ -42,10 +42,3 @@ class CustomAuthToken(ObtainAuthToken):
             'user': list(result_user)
         })
 
-class AllPost(APIView):
-    def get(self, request):
-        all_posts = Post.objects.values('id', 'content', username=F('author__username') )
-        return Response({
-            "status": True,
-            "details": all_posts 
-        })
