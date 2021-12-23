@@ -12,8 +12,10 @@ class BookApi:
         res = json.load(result)['items']
         final = []
         for item in res:
-            temp_book = Book(item["volumeInfo"]["title"], author=item["volumeInfo"]["authors"])
-            final.append(temp_book)
+            temp_book = ""
+            if("books" in item["kind"]):
+                temp_book = Book(item["volumeInfo"]["title"], author=item["volumeInfo"]["authors"])
+                final.append(temp_book)
         for book in final:
             print(book)
 
@@ -35,7 +37,8 @@ class Book:
         return self.title
 
 if __name__ == "__main__":
-    api = BookApi("intitle", "flower")
+    api = BookApi("subject", "psychology")
     api.find()
+
 
 

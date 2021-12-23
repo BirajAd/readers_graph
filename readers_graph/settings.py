@@ -34,9 +34,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
     'users',
     'follow',
-    'posts'
+    'posts',
+    'api'
 ]
 
 MIDDLEWARE = [
@@ -82,6 +85,15 @@ DATABASES = {
 
 AUTH_USER_MODEL = 'users.User'
 
+REST_FRAMEWORK = {
+        'DEFAULT_AUTHENTICATION_CLASSES': (
+            'rest_framework.authentication.TokenAuthentication',
+        ),
+        'DEFAULT_PERMISSION_CLASSES': (
+            'rest_framework.permissions.IsAuthenticated', 
+        )
+}
+
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
@@ -107,7 +119,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'CST'
+TIME_ZONE = 'UCT'
 
 USE_I18N = True
 
