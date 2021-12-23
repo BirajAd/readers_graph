@@ -18,9 +18,16 @@ class AllPost(APIView):
             "details": all_posts 
         })
 
-    # def post(self, request):
-
-
+    def post(self, request):
+         content = self.request.POST.get('content')
+         an_user = self.request.user
+         the_post = Post()
+         the_post.content = content
+         the_post.save()
+         return Response({
+             "status": True,
+             "details": "posted successfully"
+         })
 
 class IndividualPost(APIView):
     def get(self, request, post_id):
