@@ -17,6 +17,9 @@ class Post(models.Model):
 
 class SharePost(models.Model):
     id = models.IntegerField(primary_key=True)
-    shared_by = models.ForeignKey(User, on_delete=models.CASCADE, name="list_authors") #shared post gets deleted when user is deleted
-    post = models.ForeignKey(Post, on_delete=models.PROTECT, name="list_posts") # if original post gets deleted whole row is not deleted
+    shared_by = models.ForeignKey(User, on_delete=models.CASCADE, name="list_authors", blank=True, null=True) #shared post gets deleted when user is deleted
+    post = models.ForeignKey(Post, on_delete=models.PROTECT, name="list_posts", blank=True, null=True) # if original post gets deleted whole row is not deleted
     date = models.DateTimeField(default=datetime.now())
+
+    def __str__(self):
+        return self.list_posts.content
