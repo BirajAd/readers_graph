@@ -57,3 +57,43 @@ class Connection(APIView):
                 "status": True,
                 "details": get_follower
             })
+
+    
+ 
+
+class FollowUser(APIView):
+
+    def post(self,request):
+        user_id = self.request.POST.get('followee_id')
+    
+        try:
+            follow_user = User.objects.get(pk=int(user_id))
+        except:
+            return Response({
+                "status": False,
+                "details": "User doesnot exist!"    
+            })
+        followee_list = Follow.objects.filter(followee_id=int(user_id), follower_id = self.request.user.id).first()
+        current_user = self.request.user
+        the_follow = Follow()
+        the_follow.follower = current_user
+        the_follow.followee = follow_user
+        the_follow.save()
+        
+        if follow_user == current_user:
+            return  Response({
+                "status": False,
+                "details":"Bad Request: You cannot follow yourself."
+            })
+
+        if follow_user.id == followee_list.followee.id:
+            return Response({
+                "status": False,
+                "details": "Bad Request: You have already followed this user."})
+        return Response({
+            "status": True,
+            "details": f"You have started following {follow_user.first_name}"
+
+        })
+         
+
