@@ -8,10 +8,10 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from users.models import User
-from posts.models import Post
+from posts.models import Post, SharePost
 from follow.models import Follow
 from rest_framework.response import Response
-from datetime import datetime
+from datetime import date, datetime
 from django.db.models import F
 
 
@@ -41,6 +41,7 @@ class IndividualPost(APIView):
             "status": True,
             "details": a_post
         })
+
 class Connection(APIView):
     def get(self, request,  follow_type):
         if follow_type == "followee":
@@ -57,9 +58,6 @@ class Connection(APIView):
                 "status": True,
                 "details": get_follower
             })
-
-    
- 
 
 class FollowUser(APIView):
 
@@ -96,4 +94,31 @@ class FollowUser(APIView):
 
         })
          
+class Sharepost(APIView):
+    def post(self, request, post_id):
+        try:
+            a_post = Post.objects.get(pk=post_id)
+        except Exception as e:
+            return Response({
+                "status": False,
+                "details": "post doesn't exist"
+            })
+        
+        if(a_post.author == self.request.user):
+            return Response({
+                "status": False,
+                "details": "you are author of this post."
+            })
+
+        share_post = SharePost()
+        print(a_post)
+        share_post.list_posts = a_post
+        share_post.list_authors = self.request.user
+        share_post.date = datetime.now()
+        share_post.save()
+
+        return Response({
+            "status": True,
+            "details": "post shared successfully"
+        })
 
