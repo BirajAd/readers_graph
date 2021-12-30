@@ -1,3 +1,4 @@
+from django.db import models
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -41,4 +42,16 @@ class CustomAuthToken(ObtainAuthToken):
             'token': token.key,
             'user': list(result_user)
         })
+
+class CreateUser(models.Model):
+    def post(self, request, *args, **kwargs):
+        email = self.request.POST.get('email')
+        password = self.request.POST.get('username')
+        password = self.request.POST.get('password')
+        password2 = self.request.POST.get('password2')
+        if password != password2:
+            return Response({
+                "status": False,
+                "details": "password should match"
+            })
 
