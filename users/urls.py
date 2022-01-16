@@ -6,4 +6,5 @@ from django.urls.conf import include
 
 urlpatterns = [
     path('login/', CustomAuthToken.as_view(), name='login'),
+    path('register/', CreateUser.as_view(), name='register')
 ]

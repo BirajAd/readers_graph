@@ -4,11 +4,12 @@ from rest_framework.views import APIView
 from rest_framework.authtoken.views import ObtainAuthToken
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
-from users.models import User
+from users.models import User, UserManager
 from posts.models import Post
 from rest_framework.response import Response
 from datetime import datetime
 from django.db.models import F
+# from users.serialization import UserSerializer 
 
 # Create your views here.
 # class Login(APIView):
@@ -43,15 +44,23 @@ class CustomAuthToken(ObtainAuthToken):
             'user': list(result_user)
         })
 
-class CreateUser(models.Model):
+class CreateUser(APIView):
     def post(self, request, *args, **kwargs):
-        email = self.request.POST.get('email')
-        password = self.request.POST.get('username')
-        password = self.request.POST.get('password')
-        password2 = self.request.POST.get('password2')
-        if password != password2:
+        email = self.request.data.get('email')
+        username = self.request.data.get('username')
+        password = self.request.data.get('password')
+        date_of_birth = self.request.data.get('date_of_birth')
+        if not password:
             return Response({
                 "status": False,
-                "details": "password should match"
+                "details": "password is required"
             })
+        anUser = User.objects.create_user(email, password, date_of_birth, username)
+        result_user = User.objects.filter(pk=anUser.id).values('id', 'username', 'last_active', 'first_name', 'last_name', 'bio', 'profile_picture', 'email', 'gender', 'organization', 'city', 'country', 'is_superuser')
+        token, created = Token.objects.get_or_create(user=anUser)
+        return Response({
+            "token": token.key,
+            "user": list(result_user)
+        })
+
 
