@@ -3,8 +3,10 @@ from users.views import *
 from rest_framework.authtoken import views
 from django.urls import path, include
 from django.urls.conf import include
-from users import views
+from . import views
 
 urlpatterns = [
     path('login/', CustomAuthToken.as_view(), name='login'),
+    path('',views.home),
+    
 ]

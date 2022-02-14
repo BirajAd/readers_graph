@@ -8,9 +8,10 @@ from posts.models import Post
 from rest_framework.response import Response
 from datetime import datetime
 from django.db.models import F
+from django.db import models
 
-
-
+def home(request):
+   return render(request,'home.html')
 
 # Create your views here.
 # class Login(APIView):
