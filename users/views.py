@@ -1,17 +1,15 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.authtoken.views import ObtainAuthToken
-from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from users.models import User
-from posts.models import Post
 from rest_framework.response import Response
 from datetime import datetime
-from django.db.models import F
-from django.db import models
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from rest_auth.registration.views import SocialLoginView
 
-def home(request):
-   return render(request,'home.html')
+class GoogleLogin(SocialLoginView):
+    adapter_class = GoogleOAuth2Adapter
 
 # Create your views here.
 # class Login(APIView):
