@@ -8,6 +8,10 @@ class BookApi:
         self.query = query
 
     def find(self):
+        term = ""
+        for i in self.query.split():
+            term += i
+        self.query = term
         result = urlopen(self.url+self.query_type+":"+self.query)
         res = json.load(result)['items']
         final = []
@@ -37,7 +41,7 @@ class Book:
         return self.title
 
 if __name__ == "__main__":
-    api = BookApi("subject", "psychology")
+    api = BookApi("intitle", "when breathe")
     api.find()
 
 

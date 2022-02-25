@@ -23,3 +23,9 @@ class SharePost(models.Model):
 
     def __str__(self):
         return self.list_posts.content
+
+class Photo(models.Model):
+    id = models.IntegerField(primary_key=True)
+    path = models.CharField(max_length=255)
+    description = models.CharField(max_length=255, default="")
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, blank=True, null=True)
