@@ -1,10 +1,7 @@
-from django.db import models
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
-from users.models import User, UserManager
-from posts.models import Post
+from users.models import User
 from rest_framework.response import Response
 from datetime import datetime
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter

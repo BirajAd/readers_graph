@@ -7,9 +7,5 @@ from . import views
 
 urlpatterns = [
     path('login/', CustomAuthToken.as_view(), name='login'),
-<<<<<<< HEAD
-    
-=======
     path('register/', CreateUser.as_view(), name='register')
->>>>>>> main
 ]
