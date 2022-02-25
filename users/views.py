@@ -47,6 +47,22 @@ class CustomAuthToken(ObtainAuthToken):
             'user': list(result_user)
         })
 
+class Logout(APIView):
+    def get(self, request, format=None):
+        token = Token.objects.get(user=request.user)
+        try:
+            token.delete()
+
+            return Response({
+                "status": True,
+                "details": "logged out successfully"
+            })
+        except Exception as e:
+            return Response({
+                "status": False,
+                "details": str(e)
+            })
+
 class MyObtainTokenPairView(TokenObtainPairView):
     permission_classes = (AllowAny,)
     serializer_class = MyTokenObtainPairSerializer
