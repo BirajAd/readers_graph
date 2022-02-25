@@ -1,3 +1,4 @@
+from django.db import models
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -13,19 +14,6 @@ from .serializers import MyTokenObtainPairSerializer
 
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
-
-# Create your views here.
-# class Login(APIView):
-#     def post(self, request, *args, **kwargs):
-#         is_authenticated = authenticate(self.request.POST.get("username"), self.request.POST.get("password"))
-#         resp = {}
-#         if(is_authenticated):
-#             resp["status"] = True
-#             resp["details"]["key"] = Token.objects.get(user=request.POST.user).key
-#             resp["user"] = User.objects.get(user=request.POST.user)
-#             return Response(resp)
-#         else:
-#             return Response({"status": False, "details": "either email or password is wrong."})
 
 
 class CustomAuthToken(ObtainAuthToken):
@@ -74,4 +62,23 @@ class UserInfo(APIView):
         return Response({
             "status": True,
             "user": user
+        })
+        
+class CreateUser(APIView):
+    def post(self, request, *args, **kwargs):
+        email = self.request.data.get('email')
+        username = self.request.data.get('username')
+        password = self.request.data.get('password')
+        date_of_birth = self.request.data.get('date_of_birth')
+        if not password:
+            return Response({
+                "status": False,
+                "details": "password is required"
+            })
+        anUser = User.objects.create_user(email, password, date_of_birth, username)
+        result_user = User.objects.filter(pk=anUser.id).values('id', 'username', 'last_active', 'first_name', 'last_name', 'bio', 'profile_picture', 'email', 'gender', 'organization', 'city', 'country', 'is_superuser')
+        token, created = Token.objects.get_or_create(user=anUser)
+        return Response({
+            "token": token.key,
+            "user": list(result_user)
         })
