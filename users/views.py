@@ -7,11 +7,20 @@ from datetime import datetime
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from rest_auth.registration.views import SocialLoginView
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.permissions import AllowAny
 from .serializers import MyTokenObtainPairSerializer
 
-class GoogleLogin(SocialLoginView):
+class GoogleLogin(SocialLoginView, TokenObtainPairView):
     adapter_class = GoogleOAuth2Adapter
+
+    def get_response(self):
+        # token = MyObtainTokenPairView.as_view().get_token(self.request.user)
+        token = MyTokenObtainPairSerializer.get_token(self.request.user)
+        return Response({
+            "access_token": str(token.access_token),
+            "refresh_token": str(token)
+        })
 
 
 class CustomAuthToken(ObtainAuthToken):
