@@ -52,7 +52,8 @@ INSTALLED_APPS = [
     'users',
     'follow',
     'posts',
-    'api'
+    'api',
+    'graphene_django',
 ]
 
 MIDDLEWARE = [
