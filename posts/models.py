@@ -22,7 +22,7 @@ class SharePost(models.Model):
     date = models.DateTimeField()
 
     def __str__(self):
-        return self.list_posts.content
+        return self.post.content
 
 class Photo(models.Model):
     id = models.IntegerField(primary_key=True)
