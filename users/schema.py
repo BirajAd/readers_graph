@@ -2,12 +2,17 @@ from dataclasses import fields
 from follow.models import Follow
 import graphene
 from graphene_django import DjangoObjectType
-from posts.models import Post, SharePost
+from posts.models import Photo, Post, SharePost
 from .models import User
 
 class PostType(DjangoObjectType):
     class Meta:
         model = Post
+        fields = "__all__"
+
+class PhotoType(DjangoObjectType):
+    class Meta:
+        model = Photo
         fields = "__all__"
 
 class FollowType(DjangoObjectType):
