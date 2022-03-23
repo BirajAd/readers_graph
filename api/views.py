@@ -21,17 +21,10 @@ class AllPost(APIView):
     def get(self, request):
         all_posts = Post.objects.values('id', 'content', post_author=F('author__username'))
        
-        for p in all_posts:
-            
+        for p in all_posts: 
             img_path = Photo.objects.filter(post__id= p["id"]).values('id','path')
             p['path']= img_path
-            print(p)
 
-
-
-
-        
-        
         return Response({
             "status": True,
             "details": all_posts
@@ -125,7 +118,6 @@ class Sharepost(APIView):
             })
 
         share_post = SharePost()
-        print(a_post)
         share_post.list_posts = a_post
         share_post.list_authors = self.request.user
         share_post.date = datetime.now()
