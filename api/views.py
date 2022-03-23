@@ -1,3 +1,4 @@
+import email
 from django.db import reset_queries
 from django.http import response
 from django.shortcuts import render
@@ -7,6 +8,7 @@ from rest_framework.views import APIView
 from rest_framework.authtoken.views import ObtainAuthToken
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
+from posts.models import Photo
 from users.models import User
 from posts.models import Post, SharePost
 from follow.models import Follow
@@ -18,9 +20,21 @@ from django.db.models import F
 class AllPost(APIView):
     def get(self, request):
         all_posts = Post.objects.values('id', 'content', post_author=F('author__username'))
+       
+        for p in all_posts:
+            
+            img_path = Photo.objects.filter(post__id= p["id"]).values('id','path')
+            p['path']= img_path
+            print(p)
+
+
+
+
+        
+        
         return Response({
             "status": True,
-            "details": all_posts 
+            "details": all_posts
         })
 
     def post(self, request):
@@ -46,14 +60,14 @@ class Connection(APIView):
     def get(self, request,  follow_type):
         if follow_type == "followee":
             
-            get_followee = Follow.objects.filter(follower = request.user).values(first_name =F('followee__first_name'))
+            get_followee = Follow.objects.filter(follower = request.user).values(first_name =F('followee__first_name'), userid =F("followee__id") )
             return Response({
                 "status": True,
                 "details": get_followee
             })
 
         if follow_type == 'follower':
-            get_follower = Follow.objects.filter(followee = request.user).values(first_name=F('follower__first_name'))
+            get_follower = Follow.objects.filter(followee = request.user).values(first_name=F('follower__first_name'), userid =F("follower__id"), email = F("follower__email"))
             return Response({
                 "status": True,
                 "details": get_follower
