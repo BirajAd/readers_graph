@@ -8,6 +8,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
 from posts.models import Post, SharePost
+from posts.models import Photo
 
 from users.models import User
 
@@ -86,3 +87,4 @@ admin.site.register(User, UserAdmin)
 admin.site.unregister(Group)
 admin.site.register(Post)
 admin.site.register(SharePost)
+admin.site.register(Photo)
