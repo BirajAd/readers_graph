@@ -29,3 +29,19 @@ class Photo(models.Model):
     path = models.CharField(max_length=255)
     description = models.CharField(max_length=255, default="")
     post = models.ForeignKey(Post, on_delete=models.CASCADE, blank=True, null=True, related_name='list_post_photos')
+
+class Upvote(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, blank=True, null=True, related_name='list_likes')
+    user = models.ForeignKey(User,on_delete=models.CASCADE, blank=True, null=True, related_name='my_likes')
+    date = models.DateTimeField()
+
+class DownVote(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, blank=True, null=True, related_name='list_downvote')
+    user = models.ForeignKey(User,on_delete=models.CASCADE, blank=True, null=True, related_name='my_downvotes')
+    date = models.DateTimeField()
+
+class Comment(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, blank=True, null=True, related_name='post_comments')
+    user = models.ForeignKey(User,on_delete=models.CASCADE, blank=True, null=True, related_name='my_comments')
+    comments = models.TextField(max_length=255,default='')
+    date = models.DateTimeField()

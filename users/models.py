@@ -37,7 +37,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=200)
     last_name = models.CharField(max_length=200)
-    bio = models.TextField()
+    bio = models.TextField(max_length=150)
     username = models.CharField(max_length=100, unique=True)
     date_of_birth = models.DateField(null=True)
     last_active = models.DateTimeField(null=True)
