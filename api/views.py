@@ -32,7 +32,7 @@ class AllPost(APIView):
             p['downvote']= p_downvote
             p['comments']= p_comments
             p['path']= img_path
-            print(p)
+            # print(p)
 
         return Response({
             "status": True,
