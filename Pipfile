@@ -37,7 +37,8 @@ rsa = "==4.8"
 six = "==1.16.0"
 urllib3 = "==1.26.8"
 PyJWT = "==2.3.0"
-djangorestframework-simplejwt = "*"
+djangorestframework-simplejwt = "==5.0.0"
+graphene-django = "*"
 
 [dev-packages]
 
