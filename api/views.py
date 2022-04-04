@@ -100,7 +100,7 @@ class PostUpvote(APIView):
 class PostDownvote(APIView):
     def post(self, request):
         
-            post_id = self.request.POST.get('post_id')
+            post_id = json.loads(request.body)["post_id"] 
             user= request.user
             if Post.objects.filter(pk= post_id).exists() == True:
                 a_post = Post.objects.filter(pk= post_id).first()
