@@ -61,8 +61,8 @@ class IndividualPost(APIView):
 
 class PostUpvote(APIView):
     def post(self, request):
-            print(json.loads(request.body)["post_id"])
-            post_id = json.loads(request.body)["post_id"] 
+            print(request.data["post_id"])
+            post_id = request.data["post_id" ]
             
             user= request.user
             if Post.objects.filter(pk= post_id).exists() == True:
@@ -100,7 +100,7 @@ class PostUpvote(APIView):
 class PostDownvote(APIView):
     def post(self, request):
         
-            post_id = json.loads(request.body)["post_id"] 
+            post_id = request.data["post_id" ]
             user= request.user
             if Post.objects.filter(pk= post_id).exists() == True:
                 a_post = Post.objects.filter(pk= post_id).first()
@@ -137,7 +137,7 @@ class PostDownvote(APIView):
 
 class PostComment(APIView):
     def post(self,request):
-        post_id= request.POST.get("post_id")
+        post_id = request.data["post_id" ]
         comment= request.POST.get("comment")
         user = request.user
         if Post.objects.filter(pk= post_id).exists() == True:
@@ -158,18 +158,18 @@ class PostComment(APIView):
     def get(self, request):
        
         post_id = request.query_params.get("id")
-            # print(post_id)
+        print(post_id)
         if Comment.objects.filter(post__id=post_id).exists() == True:
             get_comments = Comment.objects.filter(post__id=post_id).values( 'comments' ,user_info=F('user__id'), username=F('user__username'))
             return Response({
                 "status": True,
                 "details": get_comments
             })
-
+            
         else:
             return Response({
                 "status": False,
-                "details": "Invalid post id"
+                "details": []
             })
 
 
