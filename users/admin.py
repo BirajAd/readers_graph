@@ -88,3 +88,4 @@ admin.site.unregister(Group)
 admin.site.register(Post)
 admin.site.register(SharePost)
 admin.site.register(Photo)
+

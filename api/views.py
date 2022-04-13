@@ -138,7 +138,7 @@ class PostDownvote(APIView):
 class PostComment(APIView):
     def post(self,request):
         post_id = request.data["post_id" ]
-        comment= request.POST.get("comment")
+        comment= request.data["comment"]
         user = request.user
         if Post.objects.filter(pk= post_id).exists() == True:
                 a_post = Post.objects.filter(pk= post_id).first()
@@ -160,7 +160,8 @@ class PostComment(APIView):
         post_id = request.query_params.get("id")
         print(post_id)
         if Comment.objects.filter(post__id=post_id).exists() == True:
-            get_comments = Comment.objects.filter(post__id=post_id).values( 'comments' ,user_info=F('user__id'), username=F('user__username'))
+            get_comments = Comment.objects.filter(post__id=post_id).values( 'comments' ,user_info=F('user__id'), username=F('user__username')\
+                , profile = F('user__profile_picture'))
             return Response({
                 "status": True,
                 "details": get_comments
