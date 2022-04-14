@@ -58,10 +58,24 @@ class IndividualPost(APIView):
             "status": True,
             "details": a_post
         })
+        
 class UserPost(APIView):
     def get(self, request):
         user= request.user
         user_post = Post.objects.filter(author=user).values('id', 'content')
+        for p in user_post:
+            img_path = Photo.objects.filter(post__id= p["id"]).values('id','path')
+            p_upvote = Upvote.objects.filter(post__id=p["id"]).count()
+            p_downvote = DownVote.objects.filter(post__id=p["id"]).count()
+            p_comments = Comment.objects.filter(post__id=p["id"]).count()
+            p['upvote']= p_upvote
+            p['downvote']= p_downvote
+            p['comments']= p_comments
+            p['path']= img_path
+        return Response({
+            "status": True,
+            "details":user_post
+        })
 class PostUpvote(APIView):
     def post(self, request):
             print(request.data["post_id"])

@@ -12,6 +12,7 @@ urlpatterns = [
     path('connection/<follow_type>', Connection.as_view(), name='connection'),
     path('connection/follow/',FollowUser.as_view(), name='follow'),
     path('posts/<post_id>', IndividualPost.as_view(), name='find_post'),
+    path('mypost/', UserPost.as_view(), name='my_post'),
     path('sharepost/<post_id>', Sharepost.as_view(), name='share_post'),
     path('upvote_post/', PostUpvote.as_view(), name ='upvote_post'),
     path('downvote_post/', PostDownvote.as_view(), name ='downvote_post'),
