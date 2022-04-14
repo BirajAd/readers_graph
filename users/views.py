@@ -10,11 +10,13 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.permissions import AllowAny
 from .serializers import MyTokenObtainPairSerializer
+from allauth import socialaccount
 
 class GoogleLogin(SocialLoginView, TokenObtainPairView):
     adapter_class = GoogleOAuth2Adapter
 
     def get_response(self):
+        print(User.objects.get(pk=self.user.id).last_login)
         token = MyTokenObtainPairSerializer.get_token(self.request.user)
         return Response({
             "access": str(token.access_token),

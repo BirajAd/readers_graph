@@ -146,7 +146,8 @@ class PostComment(APIView):
                 p_comment.save()
                 return Response({
                     "status": True,
-                    "details": "Commented on the post."
+                    "details": list(Comment.objects.filter(pk=p_comment.id).values('comments' ,user_info=F('user__id'), username=F('user__username')\
+                , profile = F('user__profile_picture')))
                 })
         
         else:
@@ -160,7 +161,7 @@ class PostComment(APIView):
         post_id = request.query_params.get("id")
         print(post_id)
         if Comment.objects.filter(post__id=post_id).exists() == True:
-            get_comments = Comment.objects.filter(post__id=post_id).values( 'comments' ,user_info=F('user__id'), username=F('user__username')\
+            get_comments = Comment.objects.filter(post__id=post_id).order_by('-date').values('comments' ,user_info=F('user__id'), username=F('user__username')\
                 , profile = F('user__profile_picture'))
             return Response({
                 "status": True,
