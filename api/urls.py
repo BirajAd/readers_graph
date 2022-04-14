@@ -15,5 +15,5 @@ urlpatterns = [
     path('sharepost/<post_id>', Sharepost.as_view(), name='share_post'),
     path('upvote_post/', PostUpvote.as_view(), name ='upvote_post'),
     path('downvote_post/', PostDownvote.as_view(), name ='downvote_post'),
-    path('post_comment/', PostComment.as_view(), name ='post_comment'),
+    path('post_comment/<post_id>', PostComment.as_view(), name ='post_comment'),
 ]

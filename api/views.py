@@ -58,7 +58,10 @@ class IndividualPost(APIView):
             "status": True,
             "details": a_post
         })
-
+class UserPost(APIView):
+    def get(self, request):
+        user= request.user
+        user_post = Post.objects.filter(author=user).values('id', 'content')
 class PostUpvote(APIView):
     def post(self, request):
             print(request.data["post_id"])
@@ -136,8 +139,8 @@ class PostDownvote(APIView):
             })
 
 class PostComment(APIView):
-    def post(self,request):
-        post_id = request.data["post_id" ]
+    def post(self,request,post_id):
+        # post_id = request.data["post_id" ]
         comment= request.data["comment"]
         user = request.user
         if Post.objects.filter(pk= post_id).exists() == True:
@@ -156,9 +159,9 @@ class PostComment(APIView):
                 "details": "Invalid post id"
             })
     
-    def get(self, request):
+    def get(self, request,post_id):
        
-        post_id = request.query_params.get("id")
+        # post_id = request.query_params.get("id")
         print(post_id)
         if Comment.objects.filter(post__id=post_id).exists() == True:
             get_comments = Comment.objects.filter(post__id=post_id).order_by('-date').values('comments' ,user_info=F('user__id'), username=F('user__username')\
