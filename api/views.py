@@ -62,7 +62,7 @@ class IndividualPost(APIView):
 class UserPost(APIView):
     def get(self, request):
         user= request.user
-        user_post = Post.objects.filter(author=user).values('id', 'content')
+        user_post = Post.objects.filter(author=user).values('id', 'content',post_author=F('author__username'))
         for p in user_post:
             img_path = Photo.objects.filter(post__id= p["id"]).values('id','path')
             p_upvote = Upvote.objects.filter(post__id=p["id"]).count()
