@@ -82,15 +82,26 @@ class PostUpvote(APIView):
             post_id = request.data["post_id" ]
             
             user= request.user
-            if Post.objects.filter(pk= post_id).exists() == True:
+            if Post.objects.filter(pk= post_id).exists():
                 a_post = Post.objects.filter(pk= post_id).first()
-                # print("sande",a_post)
-                upvote = Upvote(post=a_post, user=user, date=datetime.now())
-                upvote.save()
-                return Response({
-                    "status": True,
-                    "details": "Upvoted the post."
-                })
+                print("sande",a_post)
+                if Upvote.objects.filter(post= a_post,user = user).exists():
+                    Upvote.objects.filter(post= a_post,user = user).delete()
+                    return Response({
+                        "status": True,
+                        "details":"Unliked the post"
+
+                    })
+
+                else:
+                    upvote = Upvote(post=a_post, user=user, date=datetime.now())
+                    upvote.save()
+                    print("hello",upvote)
+                    return Response({
+                        "status": True,
+                        "details": "Upvoted the post."
+                    })
+
         
             else:
                 return Response({
@@ -121,13 +132,23 @@ class PostDownvote(APIView):
             user= request.user
             if Post.objects.filter(pk= post_id).exists() == True:
                 a_post = Post.objects.filter(pk= post_id).first()
+                if DownVote.objects.filter(post= a_post,user = user).exists():
+                    DownVote.objects.filter(post= a_post,user = user).delete()
+                    return Response({
+                        "status": True,
+                        "details":"Undid the downvote."
+
+                    })
+
+                else:
+                    downvote = DownVote(post=a_post, user=user, date=datetime.now())
+                    downvote.save()
+                    return Response({
+                        "status": True,
+                        "details": "Downvoted the post."
+                    })
                 # print("sande",a_post)
-                downvote = DownVote(post=a_post, user=user, date=datetime.now())
-                downvote.save()
-                return Response({
-                    "status": True,
-                    "details": "Downvoted the post."
-                })
+               
         
             else:
                 return Response({
