@@ -1,4 +1,5 @@
 import email
+import imp
 from urllib import request
 import json
 from django.db import reset_queries
@@ -18,7 +19,9 @@ from datetime import date, datetime
 from django.db.models import F
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Exists
-
+from django.core.files.storage import default_storage
+import boto3 as aws
+from django.conf import settings
 
 class AllPost(APIView):
     def get(self, request):
@@ -42,8 +45,19 @@ class AllPost(APIView):
 
     def post(self, request):
          content = self.request.POST.get('content')
+         photos = request.FILES.getlist('filename')
+         client = aws.client('s3')
+         print(photos)
          an_user = self.request.user
          the_post = Post()
+         
+         for  file in photos:
+             filename = str(the_post.id) + str(file)
+             ast =default_storage.save(filename,file)
+             response = settings.CLOUD_FRONT + str(filename)
+             
+             print(response)
+             print("sandy",filename)
          the_post.content = content
          the_post.save()
          return Response({
