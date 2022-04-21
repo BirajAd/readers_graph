@@ -33,3 +33,5 @@ urllib3==1.26.8
 zipp==3.6.0
 djangorestframework-simplejwt==5.0.0
 graphene_django
+django-storages
+boto3

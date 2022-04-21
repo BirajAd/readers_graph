@@ -22,6 +22,7 @@ from django.db.models import Exists
 from django.core.files.storage import default_storage
 import boto3 as aws
 from django.conf import settings
+from datetime import datetime
 
 class AllPost(APIView):
     def get(self, request):
@@ -46,20 +47,22 @@ class AllPost(APIView):
     def post(self, request):
          content = self.request.POST.get('content')
          photos = request.FILES.getlist('filename')
-         client = aws.client('s3')
          print(photos)
          an_user = self.request.user
-         the_post = Post()
-         
-         for  file in photos:
-             filename = str(the_post.id) + str(file)
-             ast =default_storage.save(filename,file)
+        #  the_post = Post()
+        #  the_post.content = content
+        #  the_post.save()
+         the_post = Post.objects.create(content=content, author=an_user)
+
+         for file in photos:
+             print(the_post)
+             filename = str(datetime.now())+ "_" + str(file)
+             ast = default_storage.save(filename,file)
              response = settings.CLOUD_FRONT + str(filename)
              
-             print(response)
-             print("sandy",filename)
-         the_post.content = content
-         the_post.save()
+             photo = Photo.objects.create(path=response, post=the_post)
+             print(photo)
+
          return Response({
              "status": True,
              "details": "posted successfully"

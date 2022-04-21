@@ -39,6 +39,8 @@ urllib3 = "==1.26.8"
 PyJWT = "==2.3.0"
 djangorestframework-simplejwt = "==5.0.0"
 graphene-django = "*"
+django-storages = "*"
+boto3 = "*"
 
 [dev-packages]
 
