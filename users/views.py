@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
+from follow.models import Follow
 from users.models import User
 from rest_framework.response import Response
 from datetime import date, datetime
@@ -65,8 +66,13 @@ class MyObtainTokenPairView(TokenObtainPairView):
 
 class UserInfo(APIView):
     def get(self, request, *args, **kwargs):
-        user = request.user
-        user = User.objects.filter(pk=user.id).values('id', 'username', 'last_active', 'first_name', 'last_name', 'bio', 'profile_picture', 'email', 'gender', 'organization', 'city', 'country', 'is_superuser')
+        a_user = request.user
+        user = User.objects.filter(pk=a_user.id).values('id', 'username', 'last_active', 'first_name', 'last_name', 'bio', 'profile_picture', 'email', 'gender', 'organization', 'city', 'country', 'is_superuser')
+        for u in user:
+            following= Follow.objects.filter(follower=a_user).count()
+            follower= Follow.objects.filter(followee=a_user).count()
+            u['following']= following
+            u['followers']= follower
         return Response({
             "status": True,
             "user": user

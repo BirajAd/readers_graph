@@ -26,7 +26,8 @@ from datetime import datetime
 
 class AllPost(APIView):
     def get(self, request):
-        all_posts = Post.objects.values('id', 'content', post_author=F('author__username'))
+        all_posts = Post.objects.values('id', 'content', post_author=F('author__username'), firstname=F('author__first_name'), lastname = F('author__last_name'), \
+                    profile_p = F('author__profile_picture'))
        
         for p in all_posts:
             img_path = Photo.objects.filter(post__id= p["id"]).values('id','path')
@@ -79,7 +80,8 @@ class IndividualPost(APIView):
 class UserPost(APIView):
     def get(self, request):
         user= request.user
-        user_post = Post.objects.filter(author=user).values('id', 'content',post_author=F('author__username'))
+        user_post = Post.objects.filter(author=user).values('id', 'content',post_author=F('author__username'), firstname=F('author__first_name'), lastname = F('author__last_name'), \
+                    profile_p = F('author__profile_picture'))
         for p in user_post:
             img_path = Photo.objects.filter(post__id= p["id"]).values('id','path')
             p_upvote = Upvote.objects.filter(post__id=p["id"]).count()
@@ -233,16 +235,19 @@ class PostComment(APIView):
 class Connection(APIView):
     def get(self, request,  follow_type):
         if follow_type == "followee":
-            get_followee = Follow.objects.filter(follower = request.user).values(first_name =F('followee__first_name'), userid =F("followee__id") )
+            get_followee = Follow.objects.filter(follower = request.user).values(first_name =F('followee__first_name'),last_name=F('followee__last_name'), userid =F("followee__id"), \
+             username=F("followee__username"),profile_p = F('followee__profile_picture') )
             # print(get_followee)
             
+
             return Response({
                 "status": True,
                 "details": get_followee
             })
 
         if follow_type == 'follower':
-            get_follower = Follow.objects.filter(followee = request.user).values(first_name=F('follower__first_name'), userid =F("follower__id"), email = F("follower__email"))
+            get_follower = Follow.objects.filter(followee = request.user).values(first_name=F('follower__first_name'),last_name=F('follower__last_name'), userid =F("follower__id"), \
+                 email = F("follower__email"),username=F("follower__username"),profile_p = F('follower__profile_picture'))
             # for follow in get_follower:
             #     follower = len(follow)
             #     # follow["follow"]= follower
@@ -250,7 +255,7 @@ class Connection(APIView):
             
             return Response({
                 "status": True,
-                "details":[get_follower,len(get_follower)]
+                "details":get_follower
             })
             
 
