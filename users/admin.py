@@ -9,6 +9,7 @@ from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
 from posts.models import Post, SharePost
 from posts.models import Photo
+from rest_framework_simplejwt import token_blacklist
 
 from users.models import User
 
@@ -79,7 +80,13 @@ class UserAdmin(BaseUserAdmin):
     ordering = ('email',)
     filter_horizontal = ()
 
+class OutstandingTokenAdmin(token_blacklist.admin.OutstandingTokenAdmin):
 
+    def has_delete_permission(self, *args, **kwargs):
+        return True # or whatever logic you want
+
+admin.site.unregister(token_blacklist.models.OutstandingToken)
+admin.site.register(token_blacklist.models.OutstandingToken, OutstandingTokenAdmin)
 # Now register the new UserAdmin...
 admin.site.register(User, UserAdmin)
 # ... and, since we're not using Django's built-in permissions,
@@ -88,4 +95,5 @@ admin.site.unregister(Group)
 admin.site.register(Post)
 admin.site.register(SharePost)
 admin.site.register(Photo)
+
 
