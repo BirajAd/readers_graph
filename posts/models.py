@@ -1,4 +1,5 @@
 from datetime import datetime
+from statistics import mode
 from django.db import models
 from datetime import datetime
 
@@ -7,7 +8,7 @@ from users.models import User
 # Create your models here.
 class Post(models.Model):
     content = models.TextField(blank=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='list_posts', blank=True, null=True) #original post creator
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='post_creater', blank=True, null=True) #original post creator
     post_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -41,4 +42,9 @@ class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, blank=True, null=True, related_name='post_comments')
     user = models.ForeignKey(User,on_delete=models.CASCADE, blank=True, null=True, related_name='my_comments')
     comments = models.TextField(max_length=255,default='')
+    date = models.DateTimeField(auto_now_add=True)
+
+class SavedPost(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, blank=True, null=True, related_name='saved_posts')
+    user = models.ForeignKey(User,on_delete=models.CASCADE, blank=True, null=True, related_name='saved_by')
     date = models.DateTimeField(auto_now_add=True)

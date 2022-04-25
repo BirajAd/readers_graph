@@ -3,7 +3,7 @@ from follow.models import Follow
 from rest_framework.views import APIView
 from posts.models import Photo
 from users.models import User
-from posts.models import Post, SharePost, Upvote, DownVote,Comment
+from posts.models import Post, SharePost, Upvote, DownVote,Comment, SavedPost
 from follow.models import Follow
 from rest_framework.response import Response
 from datetime import date, datetime
@@ -86,6 +86,7 @@ class UserPost(APIView):
             "status": True,
             "details":user_post
         })
+
 class PostUpvote(APIView):
     def post(self, request):
             print(request.data["post_id"])
@@ -134,6 +135,29 @@ class PostUpvote(APIView):
                     "status": False,
                     "details": "invalid postId"
                 })
+
+class LikedPosts(APIView):
+    def get(self,request):
+        user= request.user
+        liked_posts = Upvote.objects.filter(user__id=user.id).values( 'post','user', content=F('post__content'),  post_author=F('post__author__username'), firstname=F('post__author__first_name'), lastname = F('post__author__last_name'), \
+                        profile_p = F('post__author__profile_picture'))
+
+        for p in liked_posts:
+            img_path = Photo.objects.filter(post__id= p["post"]).values_list('path',flat=True)
+            p_upvote = Upvote.objects.filter(post__id=p["post"]).count()
+            p_downvote = DownVote.objects.filter(post__id=p["post"]).count()
+            p_comments = Comment.objects.filter(post__id=p["post"]).count()
+            p['upvote']= p_upvote
+            p['downvote']= p_downvote
+            p['comments']= p_comments
+            p['path']= img_path
+        return Response({
+            "status": True,
+            "details": liked_posts
+        })
+
+
+
 class VoteCount(APIView):
     def get(self, request, post_id):
         upvote_count = Upvote.objects.filter(post__id = post_id).count()
@@ -142,7 +166,60 @@ class VoteCount(APIView):
             "details":upvote_count
         })
 
+class SavedPosts(APIView):
+    def post(self, request):
+            print(request.data["post_id"])
+            post_id = request.data["post_id" ]
+            user= request.user
+            if Post.objects.filter(pk= post_id).exists():
+                a_post = Post.objects.filter(pk= post_id).first()
+                print("sande",a_post)
+                if SavedPost.objects.filter(post= a_post,user = user).exists():
+                    SavedPost.objects.filter(post= a_post,user = user).delete()
+                    return Response({
+                        "status": True,
+                        "details":"Unsaved the post"
+
+                    })
+
+                else:
+                    saved_post = SavedPost(post=a_post, user=user, date=datetime.now())
+                    saved_post.save()
+                    print("hello",saved_post)
+                    return Response({
+                        "status": True,
+                        "details": "Saved the post."
+                    })
+
         
+            else:
+                return Response({
+                    "status": False,
+                    "details": "invalid postid"
+                })
+                
+    def get(self, request):
+            user= request.user
+            get_saved = SavedPost.objects.filter(user__id=user.id).values( 'post','user', content=F('post__content'),  post_author=F('post__author__username'), firstname=F('post__author__first_name'), lastname = F('post__author__last_name'), \
+                        profile_p = F('post__author__profile_picture'))
+
+            for p in get_saved:
+                img= Photo.objects.filter(post__id=p['post']).values_list('path', flat=True)
+                p_upvote = Upvote.objects.filter(post__id=p["post"]).count()
+                p_downvote = DownVote.objects.filter(post__id=p["post"]).count()
+                p_comments = Comment.objects.filter(post__id=p["post"]).count()
+                p["photos"]= img
+                p['upvote']= p_upvote
+                p['downvote']= p_downvote
+                p['comments']= p_comments
+
+                
+            return Response({
+                "status": True,
+                "details": get_saved
+            })
+
+           
 class PostDownvote(APIView):
     def post(self, request):
         
