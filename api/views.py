@@ -1,15 +1,6 @@
-import email
-import imp
-from urllib import request
-import json
-from django.db import reset_queries
-from django.http import response
-from django.shortcuts import render
+
 from follow.models import Follow
 from rest_framework.views import APIView
-from rest_framework.authtoken.views import ObtainAuthToken
-from django.contrib.auth import authenticate
-from rest_framework.authtoken.models import Token
 from posts.models import Photo
 from users.models import User
 from posts.models import Post, SharePost, Upvote, DownVote,Comment
@@ -143,7 +134,15 @@ class PostUpvote(APIView):
                     "status": False,
                     "details": "invalid postId"
                 })
+class VoteCount(APIView):
+    def get(self, request, post_id):
+        upvote_count = Upvote.objects.filter(post__id = post_id).count()
+        return Response({
+            "status": True,
+            "details":upvote_count
+        })
 
+        
 class PostDownvote(APIView):
     def post(self, request):
         
