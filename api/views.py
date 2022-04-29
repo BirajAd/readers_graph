@@ -18,7 +18,7 @@ from datetime import datetime
 class AllPost(APIView):
     def get(self, request):
         all_posts = Post.objects.values('id', 'content', post_author=F('author__username'), firstname=F('author__first_name'), lastname = F('author__last_name'), \
-                    profile_p = F('author__profile_picture'))
+                    profile_p = F('author__profile_picture'), userId=F('author__id'))
        
         for p in all_posts:
             img_path = Photo.objects.filter(post__id= p["id"]).values('id','path')
