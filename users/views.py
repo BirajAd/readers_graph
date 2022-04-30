@@ -76,7 +76,7 @@ class IndividualUser(APIView):
                 u['followers']= follower
             return Response({
                 "status": True,
-                "user": user
+                "details": user
             })
         else:
             return Response({
@@ -94,7 +94,7 @@ class Users(APIView):
                 u['followers']= follower
         return Response({
                 "status": True,
-                "user": user
+                "details": user
             })
 
 class LoggedInUserInfo(APIView):
