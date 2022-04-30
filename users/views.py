@@ -64,11 +64,11 @@ class MyObtainTokenPairView(TokenObtainPairView):
     permission_classes = (AllowAny,)
     serializer_class = MyTokenObtainPairSerializer
 
-class Users(APIView):
+class IndividualUser(APIView):
     def get(self, request, user_id):
         
         if User.objects.filter(pk=user_id).exists():
-            user = User.objects.filter(pk=user_id).values('id', 'username', 'last_active', 'first_name', 'last_name', 'bio', 'profile_picture', 'email', 'gender', 'organization', 'city', 'country', 'is_superuser')
+            user = User.objects.filter(pk=user_id).values('id', 'username', 'last_active', 'first_name', 'last_name', 'bio', 'profile_picture', 'email', 'gender', 'organization', 'city', 'country')
             for u in user:
                 following= Follow.objects.filter(follower=user_id).count()
                 follower= Follow.objects.filter(followee=user_id).count()
@@ -83,7 +83,21 @@ class Users(APIView):
                 'status': False,
                 'details': "User does not exist!!"
             })
-class UserInfo(APIView):
+class Users(APIView):
+    
+    def get(self,request):
+        user =User.objects.all().values('id', 'username', 'first_name', 'last_name', 'profile_picture', 'email')
+        for u in user:
+                following= Follow.objects.filter(follower=u['id']).count()
+                follower= Follow.objects.filter(followee=u['id']).count()
+                u['following']= following
+                u['followers']= follower
+        return Response({
+                "status": True,
+                "user": user
+            })
+
+class LoggedInUserInfo(APIView):
     def get(self, request, *args, **kwargs):
         a_user = request.user 
         user = User.objects.filter(pk=a_user.id).values('id', 'username', 'last_active', 'first_name', 'last_name', 'bio', 'profile_picture', 'email', 'gender', 'organization', 'city', 'country', 'is_superuser')
