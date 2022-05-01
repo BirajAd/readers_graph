@@ -62,7 +62,18 @@ class AllPost(APIView):
 
 class IndividualPost(APIView):
     def get(self, request, post_id):
-        a_post = Post.objects.filter(pk=post_id).values('id', 'content', post_author=F('author__username'))
+        a_post = Post.objects.filter(pk=post_id).values('id', 'content', post_author=F('author__username'), firstname=F('author__first_name'), lastname = F('author__last_name'), \
+                    profile_p = F('author__profile_picture'), userId=F('author__id'))
+        for p in a_post:
+            img_path = Photo.objects.filter(post__id= p["id"]).values('id','path')
+            p_upvote = Upvote.objects.filter(post__id=p["id"]).count()
+            p_downvote = DownVote.objects.filter(post__id=p["id"]).count()
+            p_comments = Comment.objects.filter(post__id=p["id"]).count()
+            p['upvote']= p_upvote
+            p['downvote']= p_downvote
+            p['comments']= p_comments
+            p['path']= img_path
+
         return Response({
             "status": True,
             "details": a_post
@@ -82,6 +93,7 @@ class UserPost(APIView):
             p['downvote']= p_downvote
             p['comments']= p_comments
             p['path']= img_path
+
         return Response({
             "status": True,
             "details":user_post
@@ -179,7 +191,6 @@ class SavedPosts(APIView):
                     return Response({
                         "status": True,
                         "details":"Unsaved the post"
-
                     })
 
                 else:
@@ -294,7 +305,7 @@ class PostComment(APIView):
         # post_id = request.query_params.get("id")
         print(post_id)
         if Comment.objects.filter(post__id=post_id).exists() == True:
-            get_comments = Comment.objects.filter(post__id=post_id).order_by('-date').values('comments' ,user_info=F('user__id'), username=F('user__username')\
+            get_comments = Comment.objects.filter(post__id=post_id).order_by('-date').values('id', 'comments' ,user_info=F('user__id'), username=F('user__username')\
                 , profile = F('user__profile_picture'))
             return Response({
                 "status": True,
@@ -315,7 +326,6 @@ class Connection(APIView):
              username=F("followee__username"),profile_p = F('followee__profile_picture') )
             # print(get_followee)
             
-
             return Response({
                 "status": True,
                 "details": get_followee
