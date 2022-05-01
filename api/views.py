@@ -110,26 +110,24 @@ class PostUpvote(APIView):
                 print("sande",a_post)
                 if Upvote.objects.filter(post= a_post,user = user).exists():
                     Upvote.objects.filter(post= a_post,user = user).delete()
+                    count = Upvote.objects.filter(post= a_post).count()
                     return Response({
                         "status": True,
-                        "details":"Unliked the post"
-
+                        "details": count
                     })
 
                 else:
                     upvote = Upvote(post=a_post, user=user, date=datetime.now())
                     upvote.save()
-                    print("hello",upvote)
+                    count = Upvote.objects.filter(post= a_post).count()
                     return Response({
                         "status": True,
-                        "details": "Upvoted the post."
+                        "details": count
                     })
-
-        
             else:
                 return Response({
                     "status": False,
-                    "details": "invalid postid"
+                    "details": "post has been deleted by the author"
                 })
     def get(self, request):
         
@@ -243,7 +241,6 @@ class PostDownvote(APIView):
                     return Response({
                         "status": True,
                         "details":"Undid the downvote."
-
                     })
 
                 else:
@@ -321,9 +318,10 @@ class PostComment(APIView):
 
 class Connection(APIView):
     def get(self, request,  follow_type):
+        user_id = request.query_params.get('user_id')
         if follow_type == "followee":
-            get_followee = Follow.objects.filter(follower = request.user).values(first_name =F('followee__first_name'),last_name=F('followee__last_name'), userid =F("followee__id"), \
-             username=F("followee__username"),profile_p = F('followee__profile_picture') )
+            get_followee = Follow.objects.filter(follower__id = user_id).values(first_name =F('followee__first_name'),last_name=F('followee__last_name'), userid =F("followee__id"), \
+             username=F("followee__username"),profile_p = F('followee__profile_picture'))
             # print(get_followee)
             
             return Response({
