@@ -81,23 +81,29 @@ class IndividualPost(APIView):
         
 class UserPost(APIView):
     def get(self, request):
-        user= request.user
-        user_post = Post.objects.filter(author=user).values('id', 'content',post_author=F('author__username'), firstname=F('author__first_name'), lastname = F('author__last_name'), \
-                    profile_p = F('author__profile_picture'))
-        for p in user_post:
-            img_path = Photo.objects.filter(post__id= p["id"]).values('id','path')
-            p_upvote = Upvote.objects.filter(post__id=p["id"]).count()
-            p_downvote = DownVote.objects.filter(post__id=p["id"]).count()
-            p_comments = Comment.objects.filter(post__id=p["id"]).count()
-            p['upvote']= p_upvote
-            p['downvote']= p_downvote
-            p['comments']= p_comments
-            p['path']= img_path
+        user_id = request.query_params.get("user_id") or request.user.id
+        if Post.objects.filter(author__id=user_id).exists():
+            user_post = Post.objects.filter(author__id=user_id).values('id', 'content',post_author=F('author__username'), firstname=F('author__first_name'), lastname = F('author__last_name'), \
+                        profile_p = F('author__profile_picture'))
+            for p in user_post:
+                img_path = Photo.objects.filter(post__id= p["id"]).values('id','path')
+                p_upvote = Upvote.objects.filter(post__id=p["id"]).count()
+                p_downvote = DownVote.objects.filter(post__id=p["id"]).count()
+                p_comments = Comment.objects.filter(post__id=p["id"]).count()
+                p['upvote']= p_upvote
+                p['downvote']= p_downvote
+                p['comments']= p_comments
+                p['path']= img_path
 
-        return Response({
-            "status": True,
-            "details":user_post
-        })
+            return Response({
+                "status": True,
+                "details":user_post
+            })
+        else:
+            return Response({
+                "status":False,
+                "details":[]
+            })
 
 class PostUpvote(APIView):
     def post(self, request):
@@ -318,60 +324,67 @@ class PostComment(APIView):
 
 class Connection(APIView):
     def get(self, request,  follow_type):
-        user_id = request.query_params.get('user_id')
-        if follow_type == "followee":
-            get_followee = Follow.objects.filter(follower__id = user_id).values(first_name =F('followee__first_name'),last_name=F('followee__last_name'), userid =F("followee__id"), \
-             username=F("followee__username"),profile_p = F('followee__profile_picture'))
-            # print(get_followee)
-            
-            return Response({
-                "status": True,
-                "details": get_followee
-            })
+        user_id = request.query_params.get('user_id') or request.user.id
+        if User.objects.filter(pk=user_id).exists():
+            if follow_type == "followee":
+                get_followee = Follow.objects.filter(follower__id = user_id).values(first_name =F('followee__first_name'),last_name=F('followee__last_name'), userid =F("followee__id"), \
+                username=F("followee__username"),profile_p = F('followee__profile_picture'))
+                # print(get_followee)
+                
+                return Response({
+                    "status": True,
+                    "details": get_followee
+                })
 
-        if follow_type == 'follower':
-            get_follower = Follow.objects.filter(followee = request.user).values(first_name=F('follower__first_name'),last_name=F('follower__last_name'), userid =F("follower__id"), \
-                 email = F("follower__email"),username=F("follower__username"),profile_p = F('follower__profile_picture'))
-            # for follow in get_follower:
-            #     follower = len(follow)
-            #     # follow["follow"]= follower
-            #     print(follow)
-            
+            if follow_type == 'follower':
+                get_follower = Follow.objects.filter(followee__id = user_id).values(first_name=F('follower__first_name'),last_name=F('follower__last_name'), userid =F("follower__id"), \
+                    email = F("follower__email"),username=F("follower__username"),profile_p = F('follower__profile_picture'))
+                # for follow in get_follower:
+                #     follower = len(follow)
+                #     # follow["follow"]= follower
+                #     print(follow)
+                
+                return Response({
+                    "status": True,
+                    "details":get_follower
+                })
+        
+        else:
             return Response({
-                "status": True,
-                "details":get_follower
+                "status": False,
+                "details":"User does not exists!!"
             })
             
 
 class FollowUser(APIView):
 
     def post(self,request):
-        user_id = self.request.POST.get('followee_id')
+        user_id = self.request.data.get('followee_id')
     
-        try:
-            follow_user = User.objects.get(pk=int(user_id))
-        except:
-            return Response({
-                "status": False,
-                "details": "User doesnot exist!"    
-            })
-        followee_list = Follow.objects.filter(followee_id=int(user_id), follower_id = self.request.user.id).first()
-        current_user = self.request.user
-        the_follow = Follow()
-        the_follow.follower = current_user
-        the_follow.followee = follow_user
-        the_follow.save()
         
+        follow_user = User.objects.get(pk=user_id)
+        
+        followed = Follow.objects.filter(followee_id=int(user_id), follower_id = self.request.user.id).exists()
+        current_user = self.request.user
         if follow_user == current_user:
             return  Response({
                 "status": False,
                 "details":"Bad Request: You cannot follow yourself."
             })
 
-        if follow_user.id == followee_list.followee.id:
+        if followed:
+            Follow.objects.filter(followee_id=int(user_id), follower_id = self.request.user.id).delete()
             return Response({
-                "status": False,
-                "details": "Bad Request: You have already followed this user."})
+                "status": True,
+                "details": "You have successfully unfollowed this user."
+            })
+
+        the_follow = Follow()
+        the_follow.follower = current_user
+        the_follow.followee = follow_user
+        the_follow.save()
+        
+        
         return Response({
             "status": True,
             "details": f"You have started following {follow_user.first_name}"

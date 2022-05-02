@@ -90,8 +90,10 @@ class Users(APIView):
         for u in user:
                 following= Follow.objects.filter(follower=u['id']).count()
                 follower= Follow.objects.filter(followee=u['id']).count()
+                u["followed"]=Follow.objects.filter(follower=request.user, followee__id=u['id']).exists()
                 u['following']= following
                 u['followers']= follower
+                
         return Response({
                 "status": True,
                 "details": user
