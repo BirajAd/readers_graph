@@ -1,3 +1,4 @@
+from requests import request
 from rest_framework.views import APIView
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
@@ -12,12 +13,20 @@ from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.permissions import AllowAny
 from .serializers import MyTokenObtainPairSerializer
 from allauth import socialaccount
+from allauth.socialaccount.models import SocialAccount
 
 class GoogleLogin(SocialLoginView, TokenObtainPairView):
     adapter_class = GoogleOAuth2Adapter
 
     def get_response(self):
-        print(User.objects.get(pk=self.user.id).last_login)
+        if(User.objects.filter(pk=self.request.user.id).first().profile_picture):
+            print('exists')
+        else:
+            profile_pic = SocialAccount.objects.filter(user_id=self.request.user.id).first().extra_data['picture']
+            user = User.objects.filter(pk=self.request.user.id).first()
+            user.profile_picture = profile_pic
+            user.save()
+
         token = MyTokenObtainPairSerializer.get_token(self.request.user)
         return Response({
             "access": str(token.access_token),
@@ -86,7 +95,7 @@ class IndividualUser(APIView):
 class Users(APIView):
     
     def get(self,request):
-        user =User.objects.all().values('id', 'username', 'first_name', 'last_name', 'profile_picture', 'email')
+        user =User.objects.all().exclude(pk=request.user.id).values('id', 'username', 'first_name', 'last_name', 'profile_picture', 'email')
         for u in user:
                 following= Follow.objects.filter(follower=u['id']).count()
                 follower= Follow.objects.filter(followee=u['id']).count()
