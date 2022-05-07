@@ -154,24 +154,29 @@ class PostUpvote(APIView):
 
 class LikedPosts(APIView):
     def get(self,request):
-        user= request.user
-        liked_posts = Upvote.objects.filter(user__id=user.id).values( 'post','user', content=F('post__content'),  post_author=F('post__author__username'), firstname=F('post__author__first_name'), lastname = F('post__author__last_name'), \
-                        profile_p = F('post__author__profile_picture'))
+        user_id = request.query_params.get("user_id") or request.user.id
+        if Post.objects.filter(author__id=user_id).exists():
+            liked_posts = Upvote.objects.filter(user__id=user_id).values( 'post','user', content=F('post__content'),  post_author=F('post__author__username'), firstname=F('post__author__first_name'), lastname = F('post__author__last_name'), \
+                            profile_p = F('post__author__profile_picture'))
 
-        for p in liked_posts:
-            img_path = Photo.objects.filter(post__id= p["post"]).values_list('path',flat=True)
-            p_upvote = Upvote.objects.filter(post__id=p["post"]).count()
-            p_downvote = DownVote.objects.filter(post__id=p["post"]).count()
-            p_comments = Comment.objects.filter(post__id=p["post"]).count()
-            p['upvote']= p_upvote
-            p['downvote']= p_downvote
-            p['comments']= p_comments
-            p['path']= img_path
-        return Response({
-            "status": True,
-            "details": liked_posts
-        })
-
+            for p in liked_posts:
+                img_path = Photo.objects.filter(post__id= p["post"]).values_list('path',flat=True)
+                p_upvote = Upvote.objects.filter(post__id=p["post"]).count()
+                p_downvote = DownVote.objects.filter(post__id=p["post"]).count()
+                p_comments = Comment.objects.filter(post__id=p["post"]).count()
+                p['upvote']= p_upvote
+                p['downvote']= p_downvote
+                p['comments']= p_comments
+                p['path']= img_path
+            return Response({
+                "status": True,
+                "details": liked_posts
+            })
+        else:
+            return Response({
+                "status":False,
+                "details":[]
+            })
 
 
 class VoteCount(APIView):
