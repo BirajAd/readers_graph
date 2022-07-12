@@ -179,12 +179,7 @@ SIMPLE_JWT = {
 }
 
 
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
-AWS_ACCESS_KEY_ID = 'AKIAUPGBD3GSZUBARGQU'
-AWS_SECRET_ACCESS_KEY = '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'
-AWS_STORAGE_BUCKET_NAME = 'aws-practicejson'
-CLOUD_FRONT = 'https://d2gwfqtxzhn359.cloudfront.net/'
 
 
 
